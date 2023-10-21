@@ -3,7 +3,7 @@ import {Databases} from "appwrite";
 import {client} from "~/utils/appwrite";
 import {FilterMatchMode} from 'primevue/api';
 import type Associacao from "~/models/Associacao";
-import {DataBase} from "~/utils/DataBase";
+import {DataBaseID, tabelaID} from "~/utils/DataBaseID";
 import {useToast} from "primevue/usetoast";
 import {ref} from "vue";
 
@@ -17,9 +17,7 @@ const databases = new Databases(client)
 
 const toast = useToast()
 
-const promise = databases.listDocuments(
-    DataBase,
-    "65319d2e1978cd822d15");
+const promise = databases.listDocuments(DataBaseID, tabelaID);
 
 onMounted(async () => {
   documentos.value = await promise.then((response) => {
@@ -31,9 +29,7 @@ onMounted(async () => {
 
 function deleteDocumento(documentoID: string) {
   console.log(documentoID)
-  const promise = databases.deleteDocument(
-      DataBase,
-      "65319d2e1978cd822d15", documentoID);
+  const promise = databases.deleteDocument(DataBaseID, tabelaID, documentoID);
 
   promise.then(function (response) {
     showMensagem(
@@ -52,9 +48,7 @@ function deleteDocumento(documentoID: string) {
 
 function createDocumento() {
   try {
-    databases.createDocument(
-        DataBase,
-        '65319d2e1978cd822d15',
+    databases.createDocument(DataBaseID, tabelaID,
         ID?.unique(), {
           CNPJ: entidade.CNPJ,
           CPF: entidade.CPF,
