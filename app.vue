@@ -95,7 +95,7 @@ const showMensagem = (mensagem: string, tipo: any, detail: string | any) => {
 <template>
   <Toast/>
   <div class="p-1">
-    <span class="font-medium text-700 uppercase">SindPesca Usuários Ativos - {{documentos.length}}</span>
+    <span class="font-medium text-700 uppercase">SindPesca Usuários Ativos - {{documentos?.length || 0}}</span>
     <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes" :style="{ width: '50vw' }">
       <div class="flex flex-wrap">
         <span class="mx-3 my-1 ">DATA LICENÇA: {{ associacaoSelected.DataLicenca }}</span>
