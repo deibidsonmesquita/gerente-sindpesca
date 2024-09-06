@@ -49,7 +49,7 @@ function deleteDocumento(documentoID: string) {
 async function createDocumento() {
   try {
 
-    if(entidade.HDDID && entidade.CNPJ) {
+    if (entidade.HDDID && entidade.CNPJ) {
       await databases.createDocument(DataBaseID, tabelaID,
           ID?.unique(), {
             CNPJ: entidade.CNPJ,
@@ -97,6 +97,24 @@ const showMensagem = (mensagem: string, tipo: any, detail: string | any) => {
   });
 };
 
+function has180DaysPassed(dateString: string): boolean {
+  // Converter a string para o formato de data, usando o padrão 'dd/mm/yyyy'
+  const [day, month, year] = dateString.split('/').map(Number);
+  const inputDate = new Date(year, month - 1, day); // O mês é baseado em zero
+
+  // Obter a data atual
+  const today = new Date();
+
+  // Calcular a diferença em milissegundos
+  const diffInMs = today.getTime() - inputDate.getTime();
+
+  // Converter a diferença para dias (1 dia = 24 horas * 60 minutos * 60 segundos * 1000 milissegundos)
+  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+  // Verificar se a diferença é maior ou igual a 180 dias
+  return diffInDays > 180;
+}
+
 </script>
 
 <template>
@@ -109,11 +127,13 @@ const showMensagem = (mensagem: string, tipo: any, detail: string | any) => {
 
     <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes" :style="{ width: '75vw' }">
       <div class="flex flex-wrap">
+        <span class="mx-3 my-1 text-blue-800 font-bold ">{{ associacaoSelected.Associacao }}</span><br>
         <span class="mx-3 my-1 ">DATA LICENÇA: {{ associacaoSelected.DataLicenca }}</span>
         <span class="mx-3 my-1 font-medium">HDDID: {{ associacaoSelected.HDDID }}</span>
-        <span class="mx-3 my-1 ">MAC: {{ associacaoSelected.MAC }}</span>
+        <span class="mx-3 my-1 text-red-400 ">MAC: {{ associacaoSelected.mac }}</span>
         <span class="mx-3 my-1">VERSÃO: {{ associacaoSelected.Versao }}.0</span>
         <span class="mx-3 my-1 ">PREÇO: {{ associacaoSelected.Valor }}</span>
+
       </div>
     </Dialog>
 
@@ -130,20 +150,32 @@ const showMensagem = (mensagem: string, tipo: any, detail: string | any) => {
     </div>
 
     <DataTable v-model:filters="filters" tableStyle="min-width: 50rem"
-               :value="documentos" paginator
+               :value="documentos" paginator selection-mode="single"
                :rows="8" size="small"
-               :globalFilterFields="['CNPJ', 'CPF', 'Presidente']">
+               :globalFilterFields="['CNPJ', 'CPF', 'Presidente', 'mac', 'cidade']">
 
       <template #header>
         <div class="flex justify-content-end">
             <span class="p-input-icon-left flex align-items-center gap-1 w-full md:w-3">
-                <InputText class="w-full" v-model="filters['global'].value" placeholder="Procurar.."/>
+                <InputText class="w-full" size="small" v-model="filters['global'].value" placeholder="Procurar.."/>
                <i class="pi pi-search"/>
             </span>
         </div>
       </template>
       <Column field="CNPJ" filterField="CNPJ" header="CNPJ"></Column>
       <Column field="CPF" header="CPF"></Column>
+      <Column header="Status">
+        <template #body="slotProps">
+          <div class="w-3rem flex align-items-center  justify-content-center bg-red-300 border-round-2xl ">
+            <span class="text-xs p-1 text-white-alpha-90"
+                  v-if="has180DaysPassed(slotProps.data.DataLicenca)">Inativo </span>
+          </div>
+          <div class="w-3rem flex align-items-center  justify-content-center bg-green-300  border-round-2xl ">
+            <span class=" border-round-2xl text-xs p-1 text-white-alpha-90"
+                  v-if="!has180DaysPassed(slotProps.data.DataLicenca)">Ativo</span>
+          </div>
+        </template>
+      </Column>
       <Column field="Presidente" header="Presidente"></Column>
       <Column field="cidade" header="Cidade"></Column>
       <Column field="mac" header="MAC"></Column>
@@ -188,7 +220,8 @@ const showMensagem = (mensagem: string, tipo: any, detail: string | any) => {
 
           <div class="flex gap-2 w-full">
             <InputNumber input-class="w-full" type="number" v-model="entidade.Valor" placeholder="Valor"/>
-            <InputNumber input-class="w-full" :min="0" :max="100" :minFractionDigits="2" v-model="entidade.Versao" placeholder="Versão"/>
+            <InputNumber input-class="w-full" :min="0" :max="100" :minFractionDigits="2" v-model="entidade.Versao"
+                         placeholder="Versão"/>
           </div>
 
           <div class="flex gap-2 w-full">
