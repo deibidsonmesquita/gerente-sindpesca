@@ -46,26 +46,33 @@ function deleteDocumento(documentoID: string) {
   });
 }
 
-function createDocumento() {
+async function createDocumento() {
   try {
-    databases.createDocument(DataBaseID, tabelaID,
-        ID?.unique(), {
-          CNPJ: entidade.CNPJ,
-          CPF: entidade.CPF,
-          Versao: entidade.Versao,
-          DataLicenca: entidade.DataLicenca,
-          Valor: entidade.Valor,
-          Presidente: entidade.Presidente,
-          Associacao: entidade.Associacao,
-          HDDID: entidade.HDDID
-        })
 
-    showMensagem(
-        'Cadastro efetuado com sucesso!',
-        'success',
-        'Dados salvos')
+    if(entidade.HDDID && entidade.CNPJ) {
+      await databases.createDocument(DataBaseID, tabelaID,
+          ID?.unique(), {
+            CNPJ: entidade.CNPJ,
+            CPF: entidade.CPF,
+            Versao: entidade.Versao,
+            DataLicenca: entidade.DataLicenca.toLocaleDateString("pt-BR"),
+            Valor: entidade.Valor,
+            Presidente: entidade.Presidente,
+            Associacao: entidade.Associacao,
+            HDDID: entidade.HDDID,
+            cidade: entidade.cidade,
+            mac: entidade.mac
+          }).catch((error) => {
+        console.log(error)
+      })
 
-    visibleDialogCadastro.value = false
+      showMensagem(
+          'Cadastro efetuado com sucesso!',
+          'success',
+          'Dados salvos')
+
+      visibleDialogCadastro.value = false
+    }
   } catch (e) {
     showMensagem(
         'Houve um erro e não foi possível salvar os dados',
@@ -94,60 +101,71 @@ const showMensagem = (mensagem: string, tipo: any, detail: string | any) => {
 
 <template>
   <Toast/>
-  <div class="p-1">
-    <span class="font-medium text-700 uppercase">SindPesca Usuários Ativos - {{documentos?.length || 0}}</span>
-    <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes" :style="{ width: '50vw' }">
+  <div class="h-3rem bg-blue-400 flex align-items-center p-2 text-white">
+    <span>:: Gerenciador SindPesca</span>
+  </div>
+  <div class="flex p-2 flex-column">
+
+
+    <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes" :style="{ width: '75vw' }">
       <div class="flex flex-wrap">
         <span class="mx-3 my-1 ">DATA LICENÇA: {{ associacaoSelected.DataLicenca }}</span>
         <span class="mx-3 my-1 font-medium">HDDID: {{ associacaoSelected.HDDID }}</span>
+        <span class="mx-3 my-1 ">MAC: {{ associacaoSelected.MAC }}</span>
         <span class="mx-3 my-1">VERSÃO: {{ associacaoSelected.Versao }}.0</span>
         <span class="mx-3 my-1 ">PREÇO: {{ associacaoSelected.Valor }}</span>
       </div>
     </Dialog>
 
-    <div class="flex gap-2 mt-2 w-full">
+    <div class="flex gap-2 mb-2 w-full align-items-center justify-content-between">
 
       <Button label="Adicionar Entidade"
               @click="visibleDialogCadastro = true"
-              icon="pi pi-plus"
-              size="small"
-              class="my-2"/>
+              icon="pi pi-plus" size="small"
+              class="my-2 w-full md:w-3"/>
+
+      <span class="font-medium text-700 text-xs uppercase">
+        SindPesca Usuários Ativos: {{ documentos?.length || 0 }}
+      </span>
     </div>
 
     <DataTable v-model:filters="filters" tableStyle="min-width: 50rem"
                :value="documentos" paginator
-               :rows="6" size="small"
+               :rows="8" size="small"
                :globalFilterFields="['CNPJ', 'CPF', 'Presidente']">
 
       <template #header>
         <div class="flex justify-content-end">
-            <span class="p-input-icon-left">
-                <i class="pi pi-search"/>
-                <InputText v-model="filters['global'].value" placeholder="Search.."/>
+            <span class="p-input-icon-left flex align-items-center gap-1 w-full md:w-3">
+                <InputText class="w-full" v-model="filters['global'].value" placeholder="Procurar.."/>
+               <i class="pi pi-search"/>
             </span>
         </div>
       </template>
       <Column field="CNPJ" filterField="CNPJ" header="CNPJ"></Column>
       <Column field="CPF" header="CPF"></Column>
       <Column field="Presidente" header="Presidente"></Column>
-      <Column field="Associacao" header="Entidade"></Column>
+      <Column field="cidade" header="Cidade"></Column>
+      <Column field="mac" header="MAC"></Column>
+      <Column field="HDDID" header="HDID"></Column>
+      <Column field="DataLicenca" header="Data"></Column>
       <Column>
-        <template class="white-space-nowrap" #body="slotProps">
+        <template #body="slotProps">
+          <div class="white-space-nowrap">
+            <Button @click="deleteDocumento(slotProps.data.$id)"
+                    size="small"
+                    severity="danger"
+                    icon="pi pi-trash"/>
 
-          <Button @click="deleteDocumento(slotProps.data.$id)"
-                  size="small"
-                  severity="danger"
-                  icon="pi pi-trash"/>
-
-          <Button label="" @click="showDetalhes(slotProps.data)"
-                  icon="pi pi-search"
-                  size="small" class="ml-1"/>
-
+            <Button label="" @click="showDetalhes(slotProps.data)"
+                    icon="pi pi-search"
+                    size="small" class="ml-1"/>
+          </div>
         </template>
       </Column>
     </DataTable>
 
-    <Dialog v-model:visible="visibleDialogCadastro" modal header="Cadastro"
+    <Dialog v-model:visible="visibleDialogCadastro" modal header="Cadastro Entidades"
             :breakpoints="{ '960px': '75vw', '641px': '95vw' }"
             :style="{ width: '50vw' }">
 
@@ -169,29 +187,38 @@ const showMensagem = (mensagem: string, tipo: any, detail: string | any) => {
           </div>
 
           <div class="flex gap-2 w-full">
-            <InputText class="w-full" type="number" v-model="entidade.Valor" placeholder="Valor"/>
-            <InputText class="w-full" type="number" v-model="entidade.Versao" placeholder="Versão"/>
+            <InputNumber input-class="w-full" type="number" v-model="entidade.Valor" placeholder="Valor"/>
+            <InputNumber input-class="w-full" :min="0" :max="100" :minFractionDigits="2" v-model="entidade.Versao" placeholder="Versão"/>
           </div>
 
-          <div class="flex w-full">
+          <div class="flex gap-2 w-full">
             <InputText class="w-full" v-model="entidade.HDDID" placeholder="HDDID"/>
+            <InputText class="w-full" v-model="entidade.mac" placeholder="MAC"/>
+          </div>
+
+          <div class="flex gap-2 w-full">
+            <Calendar class="w-full w-6" dateFormat="dd/mm/yy" showIcon fluid v-model="entidade.DataLicenca"
+                      placeholder="Data Licença"/>
+            <Calendar class="w-full w-6" placeholder="expiração" dateFormat="dd/mm/yy"/>
           </div>
 
           <div class="flex w-full">
-            <InputText class="w-full" v-model="entidade.DataLicenca" placeholder="Data Licença"/>
-          </div>
-
-          <div class="flex w-full">
-            <InputText class="w-full" placeholder="Cidade"/>
+            <InputText class="w-full" placeholder="Cidade" v-model="entidade.cidade"/>
           </div>
         </div>
 
         <Button @click="createDocumento"
                 class="mt-2 w-full"
-                size="small"
                 label="Cadastrar entidade"/>
       </form>
     </Dialog>
 
   </div>
 </template>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+</style>

@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     ],
     primevue: {
         components: {
-            include: ['Button', 'DataTable', 'Column', 'InputText', 'Dialog', 'Toast']
+            include: ['Button', 'DataTable', 'Column', 'InputText', 'InputNumber', 'Dialog', 'Toast','Calendar']
         },
         composables: {
             include: '*'

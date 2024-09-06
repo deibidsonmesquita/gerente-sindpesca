@@ -7,4 +7,6 @@ export default interface Associacao {
     Versao:number;
     DataLicenca: string;
     HDDID: string;
+    mac: string;
+    cidade: string;
 }
