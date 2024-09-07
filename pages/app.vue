@@ -16,6 +16,7 @@ const entidade = reactive<Partial<Associacao>>({})
 const databases = new Databases(client)
 
 const toast = useToast()
+const route = useRouter()
 
 const promise = databases.listDocuments(DataBaseID, tabelaID);
 
@@ -119,15 +120,17 @@ function has180DaysPassed(dateString: string): boolean {
 
 <template>
   <Toast/>
-  <div class="h-3rem bg-blue-400 flex align-items-center p-2 text-white">
+  <div class="h-3rem bg-blue-400 flex align-items-center justify-content-between p-2 text-white">
     <span>:: Gerenciador SindPesca</span>
+    <span class="cursor-pointer" @click="route.push({path:'/', replace:true})">Sair</span>
   </div>
   <div class="flex p-2 flex-column">
 
 
-    <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes" :style="{ width: '75vw' }">
+    <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :style="{ width: '50vw' }">
       <div class="flex flex-wrap">
-        <span class="mx-3 my-1 text-blue-800 font-bold ">{{ associacaoSelected.Associacao }}</span><br>
+        <span class="mx-3 my-1 text-blue-800 font-bold text-justify">{{ associacaoSelected.Associacao }}</span><br>
         <span class="mx-3 my-1 ">DATA LICENÇA: {{ associacaoSelected.DataLicenca }}</span>
         <span class="mx-3 my-1 font-medium">HDDID: {{ associacaoSelected.HDDID }}</span>
         <span class="mx-3 my-1 text-red-400 ">MAC: {{ associacaoSelected.mac }}</span>
@@ -145,7 +148,7 @@ function has180DaysPassed(dateString: string): boolean {
               class="my-2 w-full md:w-3"/>
 
       <span class="font-medium text-700 text-xs uppercase">
-        SindPesca Usuários Ativos: {{ documentos?.length || 0 }}
+       Usuários Cadastrados: {{ documentos?.length || 0 }}
       </span>
     </div>
 
