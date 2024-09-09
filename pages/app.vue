@@ -18,15 +18,13 @@ const databases = new Databases(client)
 const toast = useToast()
 const route = useRouter()
 
-const promise = databases.listDocuments(DataBaseID, tabelaID);
-
 onMounted(async () => {
-  documentos.value = await promise.then((response) => {
-    return response.documents
-  }).catch((error) => {
-    console.log(error);
-  });
+  loadUpdate()
 })
+
+function  loadUpdate(){
+  documentos.value = (await databases.listDocuments(DataBaseID, tabelaID)).documents;
+}
 
 function deleteDocumento(documentoID: string) {
   console.log(documentoID)
@@ -72,7 +70,9 @@ async function createDocumento() {
           'success',
           'Dados salvos')
 
+      loadUpdate()
       visibleDialogCadastro.value = false
+
     }
   } catch (e) {
     showMensagem(
@@ -165,9 +165,9 @@ function has180DaysPassed(dateString: string): boolean {
             </span>
         </div>
       </template>
-      <Column field="CNPJ" filterField="CNPJ" header="CNPJ"></Column>
-      <Column field="CPF" header="CPF"></Column>
-      <Column header="Status">
+      <Column field="CNPJ" filterField="CNPJ" class="text-sm" header="CNPJ"></Column>
+      <Column field="CPF" header="CPF" class="text-sm"></Column>
+      <Column class="text-sm" header="Status">
         <template #body="slotProps">
           <div class="w-3rem flex align-items-center  justify-content-center bg-red-300 border-round-2xl ">
             <span class="text-xs p-1 text-white-alpha-90"
@@ -179,11 +179,11 @@ function has180DaysPassed(dateString: string): boolean {
           </div>
         </template>
       </Column>
-      <Column field="Presidente" header="Presidente"></Column>
-      <Column field="cidade" header="Cidade"></Column>
-      <Column field="mac" header="MAC"></Column>
-      <Column field="HDDID" header="HDID"></Column>
-      <Column field="DataLicenca" header="Data"></Column>
+      <Column field="Presidente" class="text-sm" header="Presidente"></Column>
+      <Column field="cidade" class="text-sm" header="Cidade"></Column>
+      <Column field="mac" class="text-sm" header="MAC"></Column>
+      <Column field="HDDID" class="text-sm" header="HDID"></Column>
+      <Column field="DataLicenca" class="text-sm" header="Data"></Column>
       <Column>
         <template #body="slotProps">
           <div class="white-space-nowrap">
