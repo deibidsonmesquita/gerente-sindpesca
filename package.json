@@ -17,6 +17,8 @@
     "vue-router": "^4.4.3"
   },
   "dependencies": {
+    "@vueuse/core": "^11.0.3",
+    "@vueuse/nuxt": "^11.0.3",
     "appwrite": "^15.0.0",
     "nuxt-appwrite": "^1.1.1",
     "primeflex": "^3.3.1",

@@ -7,6 +7,10 @@ import {DataBaseID, tabelaID} from "~/utils/DataBaseID";
 import {useToast} from "primevue/usetoast";
 import {ref} from "vue";
 
+import {useWindowSize} from '@vueuse/core'
+
+const {width, height} = useWindowSize()
+
 const visibleDialogDetalhes = ref(false);
 const visibleDialogCadastro = ref(false);
 const documentos = ref()
@@ -19,18 +23,18 @@ const toast = useToast()
 const route = useRouter()
 
 onMounted(async () => {
-  loadUpdate()
+  await loadUpdate()
 })
 
-function  loadUpdate(){
-  documentos.value = (await databases.listDocuments(DataBaseID, tabelaID)).documents;
+async function loadUpdate() {
+  const response = await databases.listDocuments(DataBaseID, tabelaID)
+  documentos.value = response.documents
 }
 
 function deleteDocumento(documentoID: string) {
-  console.log(documentoID)
   const promise = databases.deleteDocument(DataBaseID, tabelaID, documentoID);
 
-  promise.then(function (response) {
+  promise.then(function () {
     showMensagem(
         'Dados apagados com sucesso!',
         'success',
@@ -61,16 +65,22 @@ async function createDocumento() {
             HDDID: entidade.HDDID,
             cidade: entidade.cidade,
             mac: entidade.mac
-          }).catch((error) => {
-        console.log(error)
+          }).then(() => {
+        showMensagem(
+            'Cadastro efetuado com sucesso!',
+            'success',
+            'Dados salvos')
+
+        documentos.value = []
+      }).catch((error) => {
+        showMensagem(
+            'Erro ao efetuar o cadastro!',
+            'error',
+            `Dados não foram salvos: ${error}`)
       })
 
-      showMensagem(
-          'Cadastro efetuado com sucesso!',
-          'success',
-          'Dados salvos')
 
-      loadUpdate()
+      await loadUpdate()
       visibleDialogCadastro.value = false
 
     }
@@ -121,7 +131,11 @@ function has180DaysPassed(dateString: string): boolean {
 <template>
   <Toast/>
   <div class="h-3rem bg-blue-400 flex align-items-center justify-content-between p-2 text-white">
-    <span>:: Gerenciador SindPesca</span>
+    <div class="flex align-items-center gap-2">
+      <img src="/cherry.png" alt="cherry" width="32" height="32"/>
+      <span class="font-semibold uppercase"> Gerenciador SindPesca</span>
+    </div>
+
     <span class="cursor-pointer" @click="route.push({path:'/', replace:true})">Sair</span>
   </div>
   <div class="flex p-2 flex-column">
@@ -153,9 +167,9 @@ function has180DaysPassed(dateString: string): boolean {
     </div>
 
     <DataTable v-model:filters="filters" tableStyle="min-width: 50rem"
-               :value="documentos" paginator selection-mode="single"
-               :rows="8" size="small"
-               :globalFilterFields="['CNPJ', 'CPF', 'Presidente', 'mac', 'cidade']">
+               :value="documentos" paginator selection-mode="single" v-model:selection="associacaoSelected"
+               :rows="(height <= 768) ? 8 : 10" size="small"
+               :globalFilterFields="['CNPJ', 'CPF', 'Presidente', 'mac', 'cidade', 'HDDID']">
 
       <template #header>
         <div class="flex justify-content-end">

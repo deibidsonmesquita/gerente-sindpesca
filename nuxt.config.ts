@@ -3,6 +3,7 @@ export default defineNuxtConfig({
 
   modules: [
       'nuxt-primevue',
+      '@vueuse/nuxt',
       'nuxt-appwrite'
   ],
 
