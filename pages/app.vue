@@ -16,7 +16,7 @@ const visibleDialogCadastro = ref(false);
 const documentos = ref()
 const associacaoSelected = ref<Partial<Associacao>>({})
 
-const entidade = reactive<Partial<Associacao>>({})
+let entidade = reactive<Partial<Associacao>>({})
 const databases = new Databases(client)
 
 const toast = useToast()
@@ -71,7 +71,7 @@ async function createDocumento() {
             'success',
             'Dados salvos')
 
-        documentos.value = []
+        entidade = {}
       }).catch((error) => {
         showMensagem(
             'Erro ao efetuar o cadastro!',
@@ -132,7 +132,7 @@ function has180DaysPassed(dateString: string): boolean {
   <Toast/>
   <div class="h-3rem bg-blue-400 flex align-items-center justify-content-between p-2 text-white">
     <div class="flex align-items-center gap-2">
-      <img src="/cherry.png" alt="cherry" width="32" height="32"/>
+      <img src="/cherry.png" alt="cherry" width="30" height="30"/>
       <span class="font-semibold uppercase"> Gerenciador SindPesca</span>
     </div>
 
