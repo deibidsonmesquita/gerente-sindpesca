@@ -1,4 +1,5 @@
 export default interface Associacao {
+    $id: string;
     Associacao: string;
     CNPJ: string;
     CPF : string;
@@ -9,4 +10,5 @@ export default interface Associacao {
     HDDID: string;
     mac: string;
     cidade: string;
+    obs: string
 }

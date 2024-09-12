@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Databases} from "appwrite";
+import {Databases, Query} from "appwrite";
 import {client} from "~/utils/appwrite";
 import {FilterMatchMode} from 'primevue/api';
 import type Associacao from "~/models/Associacao";
@@ -9,7 +9,7 @@ import {ref} from "vue";
 
 import {useWindowSize} from '@vueuse/core'
 
-const {width, height} = useWindowSize()
+const {height} = useWindowSize()
 
 const visibleDialogDetalhes = ref(false);
 const visibleDialogCadastro = ref(false);
@@ -26,12 +26,32 @@ onMounted(async () => {
   await loadUpdate()
 })
 
-async function loadUpdate() {
+async function loadUpdate(): void {
   const response = await databases.listDocuments(DataBaseID, tabelaID)
   documentos.value = response.documents
 }
 
-function deleteDocumento(documentoID: string) {
+async function uptateDocumento(): void {
+  if (associacaoSelected.value.Associacao && associacaoSelected.value.HDDID) {
+    await databases.updateDocument(
+        DataBaseID,
+        tabelaID,
+        associacaoSelected.value.$id,
+        {
+          'DataLicenca': associacaoSelected.value.DataLicenca,
+          'HDDID': associacaoSelected.value.HDDID,
+          'mac': associacaoSelected.value.mac,
+          'obs': associacaoSelected.value.obs,
+          'Valor': associacaoSelected.value.Valor,
+          'Versao': associacaoSelected.value.Versao
+        }
+    ).then(() => {
+      alert('Dados atualizados!')
+    });
+  }
+}
+
+function deleteDocumento(documentoID: string): void {
   const promise = databases.deleteDocument(DataBaseID, tabelaID, documentoID);
 
   promise.then(function () {
@@ -49,7 +69,7 @@ function deleteDocumento(documentoID: string) {
   });
 }
 
-async function createDocumento() {
+async function createDocumento(): void {
   try {
 
     if (entidade.HDDID && entidade.CNPJ) {
@@ -64,7 +84,8 @@ async function createDocumento() {
             Associacao: entidade.Associacao,
             HDDID: entidade.HDDID,
             cidade: entidade.cidade,
-            mac: entidade.mac
+            mac: entidade.mac,
+            obs: entidade.obs
           }).then(() => {
         showMensagem(
             'Cadastro efetuado com sucesso!',
@@ -132,7 +153,7 @@ function has180DaysPassed(dateString: string): boolean {
   <Toast/>
   <div class="h-3rem bg-blue-400 flex align-items-center justify-content-between p-2 text-white">
     <div class="flex align-items-center gap-2">
-      <img src="/cherry.png" alt="cherry" width="30" height="30"/>
+      <img src="/cherry.png" alt="cherry" width="24" height="24"/>
       <span class="font-semibold uppercase"> Gerenciador SindPesca</span>
     </div>
 
@@ -141,17 +162,64 @@ function has180DaysPassed(dateString: string): boolean {
   <div class="flex p-2 flex-column">
 
 
-    <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes"
+    <Dialog v-model:visible="visibleDialogDetalhes" modal header="Detalhes da Entidade"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :style="{ width: '50vw' }">
-      <div class="flex flex-wrap">
-        <span class="mx-3 my-1 text-blue-800 font-bold text-justify">{{ associacaoSelected.Associacao }}</span><br>
-        <span class="mx-3 my-1 ">DATA LICENÇA: {{ associacaoSelected.DataLicenca }}</span>
-        <span class="mx-3 my-1 font-medium">HDDID: {{ associacaoSelected.HDDID }}</span>
-        <span class="mx-3 my-1 text-red-400 ">MAC: {{ associacaoSelected.mac }}</span>
-        <span class="mx-3 my-1">VERSÃO: {{ associacaoSelected.Versao }}.0</span>
-        <span class="mx-3 my-1 ">PREÇO: {{ associacaoSelected.Valor }}</span>
 
-      </div>
+      <form id="detalheForm" method="post">
+        <div class="gap-2 flex flex-wrap">
+          <div class="flex w-full">
+            <InputText class="w-full" v-model="associacaoSelected.Associacao" placeholder="Nome Entidade"/>
+          </div>
+          <div class="flex w-full">
+            <InputText class="w-full" disabled v-model="associacaoSelected.CNPJ" placeholder="CNPJ"/>
+          </div>
+
+          <div class="flex w-full">
+            <InputText class="w-full" disabled v-model="associacaoSelected.Presidente" placeholder="Presidente"/>
+          </div>
+
+          <div class="flex w-full">
+            <InputText class="w-full" disabled v-model="associacaoSelected.CPF" placeholder="CPF"/>
+          </div>
+
+          <div class="flex gap-2 w-full">
+            <InputNumber input-class="w-full" class="w-12 md:w-6" type="number" v-model="associacaoSelected.Valor" placeholder="Valor"/>
+            <InputNumber input-class="w-full" class="w-12 md:w-6" :min="0" :max="100" :minFractionDigits="2"
+                         v-model="associacaoSelected.Versao"
+                         placeholder="Versão"/>
+          </div>
+
+          <div class="flex gap-2 w-full">
+            <InputText class="w-full" v-model="associacaoSelected.HDDID" placeholder="HDDID"/>
+            <InputText class="w-full" v-model="associacaoSelected.mac" placeholder="MAC"/>
+          </div>
+
+          <div class="flex gap-2 w-full">
+            <Calendar class="w-full w-6" dateFormat="dd/mm/yy" showIcon fluid v-model="associacaoSelected.DataLicenca"
+                      placeholder="Data Licença"/>
+            <InputText class="w-full w-6" placeholder="Observação" v-model="associacaoSelected.obs"/>
+          </div>
+
+          <div class="flex w-full">
+            <InputText class="w-full" disabled placeholder="Cidade" v-model="associacaoSelected.cidade"/>
+          </div>
+        </div>
+
+        <Button @click="uptateDocumento" icon="pi pi-refresh"
+                class="mt-2 w-full p-button-warning text-800"
+                label="Atualizar dados"/>
+
+        <span class="text-xs text-400"> ID {{ associacaoSelected.$id }}</span>
+      </form>
+      <!--      <div class="flex flex-wrap">
+              <span class="mx-3 my-1 text-blue-800 font-bold text-justify">{{ associacaoSelected.Associacao }}</span><br>
+              <span class="mx-3 my-1 ">DATA LICENÇA: {{ associacaoSelected.DataLicenca }}</span>
+              <span class="mx-3 my-1 font-medium">HDDID: {{ associacaoSelected.HDDID }}</span>
+              <span class="mx-3 my-1 text-red-400 ">MAC: {{ associacaoSelected.mac }}</span>
+              <span class="mx-3 my-1">VERSÃO: {{ associacaoSelected.Versao }}.0</span>
+              <span class="mx-3 my-1 ">PREÇO: {{ associacaoSelected.Valor }}</span>
+
+            </div>-->
     </Dialog>
 
     <div class="flex gap-2 mb-2 w-full align-items-center justify-content-between">
@@ -162,7 +230,7 @@ function has180DaysPassed(dateString: string): boolean {
               class="my-2 w-full md:w-3"/>
 
       <span class="font-medium text-700 text-xs uppercase">
-       Usuários Cadastrados: {{ documentos?.length || 0 }}
+       Entidades Cadastradas: {{ documentos?.length || 0 }}
       </span>
     </div>
 
@@ -249,7 +317,7 @@ function has180DaysPassed(dateString: string): boolean {
           <div class="flex gap-2 w-full">
             <Calendar class="w-full w-6" dateFormat="dd/mm/yy" showIcon fluid v-model="entidade.DataLicenca"
                       placeholder="Data Licença"/>
-            <Calendar class="w-full w-6" placeholder="expiração" dateFormat="dd/mm/yy"/>
+            <InputText class="w-full w-6" placeholder="expiração" v-model="entidade.obs"/>
           </div>
 
           <div class="flex w-full">
@@ -257,7 +325,7 @@ function has180DaysPassed(dateString: string): boolean {
           </div>
         </div>
 
-        <Button @click="createDocumento"
+        <Button @click="createDocumento" icon="pi pi-save"
                 class="mt-2 w-full"
                 label="Cadastrar entidade"/>
       </form>

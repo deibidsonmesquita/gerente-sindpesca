@@ -6,10 +6,10 @@ const usuario = ref({
   senha: "",
 })
 
-function efetuarlogin(){
-  if(usuario.value.login === 'sindpesca' && usuario.value.senha === 'sindpesca123') {
-    route.push({path: 'app', replace: true})
-  }else{
+function efetuarlogin() {
+  if (usuario.value.login === 'sindpesca' && usuario.value.senha === 'sindpesca123') {
+    route.push({path: 'home', replace: true})
+  } else {
     alert('Login incorreto')
   }
 }
@@ -17,8 +17,9 @@ function efetuarlogin(){
 </script>
 
 <template>
-  <div class="h-3rem bg-blue-400 flex align-items-center p-2 text-white">
-    <span>:: Gerenciador SindPesca</span>
+  <div class="h-3rem bg-blue-400 gap-2 flex align-items-center p-2 text-white">
+    <img src="/cherry.png" alt="cherry" width="24" height="24"/>
+    <span class="font-semibold uppercase"> Gerenciador SindPesca</span>
   </div>
   <div class="flex justify-content-center md:p-8 p-6">
 
@@ -26,7 +27,7 @@ function efetuarlogin(){
       <p class="font-bold uppercase text-blue-400">Gerenciador - Login</p>
       <InputText class="w-full" v-model="usuario.login" placeholder="Login"/>
       <InputText type="password" class="w-full" v-model="usuario.senha" placeholder="Password"/>
-      <Button label="Entrar" @click="efetuarlogin" />
+      <Button label="Entrar" @click="efetuarlogin"/>
       <span></span>
     </div>
   </div>
