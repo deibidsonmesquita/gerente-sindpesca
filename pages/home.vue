@@ -38,7 +38,7 @@ async function uptateDocumento(): void {
         tabelaID,
         associacaoSelected.value.$id,
         {
-          'DataLicenca': associacaoSelected.value.DataLicenca,
+          'DataLicenca': associacaoSelected.value.DataLicenca.toLocaleDateString("pt-BR"),
           'HDDID': associacaoSelected.value.HDDID,
           'mac': associacaoSelected.value.mac,
           'obs': associacaoSelected.value.obs,
