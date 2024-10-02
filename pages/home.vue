@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Databases, Query} from "appwrite";
+import {Databases} from "appwrite";
 import {client} from "~/utils/appwrite";
 import {FilterMatchMode} from 'primevue/api';
 import type Associacao from "~/models/Associacao";
@@ -26,19 +26,19 @@ onMounted(async () => {
   await loadUpdate()
 })
 
-async function loadUpdate(): void {
+async function loadUpdate() {
   const response = await databases.listDocuments(DataBaseID, tabelaID)
   documentos.value = response.documents
 }
 
-async function uptateDocumento(): void {
+async function uptateDocumento() {
   if (associacaoSelected.value.Associacao && associacaoSelected.value.HDDID) {
     await databases.updateDocument(
         DataBaseID,
         tabelaID,
         associacaoSelected.value.$id,
         {
-          'DataLicenca': associacaoSelected.value.DataLicenca.toLocaleDateString("pt-BR"),
+          'DataLicenca': associacaoSelected.value.DataLicenca,
           'HDDID': associacaoSelected.value.HDDID,
           'mac': associacaoSelected.value.mac,
           'obs': associacaoSelected.value.obs,
@@ -69,7 +69,7 @@ function deleteDocumento(documentoID: string): void {
   });
 }
 
-async function createDocumento(): void {
+async function createDocumento() {
   try {
 
     if (entidade.HDDID && entidade.CNPJ) {
@@ -99,7 +99,6 @@ async function createDocumento(): void {
             'error',
             `Dados não foram salvos: ${error}`)
       })
-
 
       await loadUpdate()
       visibleDialogCadastro.value = false
@@ -195,7 +194,7 @@ function has180DaysPassed(dateString: string): boolean {
           </div>
 
           <div class="flex gap-2 w-full">
-            <Calendar class="w-full w-6" dateFormat="dd/mm/yy" showIcon fluid v-model="associacaoSelected.DataLicenca"
+            <InputMask class="w-full w-6" mask="99/99/9999" v-model="associacaoSelected.DataLicenca"
                       placeholder="Data Licença"/>
             <InputText class="w-full w-6" placeholder="Observação" v-model="associacaoSelected.obs"/>
           </div>
@@ -211,15 +210,7 @@ function has180DaysPassed(dateString: string): boolean {
 
         <span class="text-xs text-400"> ID {{ associacaoSelected.$id }}</span>
       </form>
-      <!--      <div class="flex flex-wrap">
-              <span class="mx-3 my-1 text-blue-800 font-bold text-justify">{{ associacaoSelected.Associacao }}</span><br>
-              <span class="mx-3 my-1 ">DATA LICENÇA: {{ associacaoSelected.DataLicenca }}</span>
-              <span class="mx-3 my-1 font-medium">HDDID: {{ associacaoSelected.HDDID }}</span>
-              <span class="mx-3 my-1 text-red-400 ">MAC: {{ associacaoSelected.mac }}</span>
-              <span class="mx-3 my-1">VERSÃO: {{ associacaoSelected.Versao }}.0</span>
-              <span class="mx-3 my-1 ">PREÇO: {{ associacaoSelected.Valor }}</span>
 
-            </div>-->
     </Dialog>
 
     <div class="flex gap-2 mb-2 w-full align-items-center justify-content-between">
@@ -317,7 +308,7 @@ function has180DaysPassed(dateString: string): boolean {
           <div class="flex gap-2 w-full">
             <Calendar class="w-full w-6" dateFormat="dd/mm/yy" showIcon fluid v-model="entidade.DataLicenca"
                       placeholder="Data Licença"/>
-            <InputText class="w-full w-6" placeholder="expiração" v-model="entidade.obs"/>
+            <InputText class="w-full w-6" placeholder="observação" v-model="entidade.obs"/>
           </div>
 
           <div class="flex w-full">
