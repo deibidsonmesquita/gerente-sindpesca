@@ -78,7 +78,7 @@ async function createDocumento() {
             CNPJ: entidade.CNPJ,
             CPF: entidade.CPF,
             Versao: entidade.Versao,
-            DataLicenca: entidade.DataLicenca.toLocaleDateString("pt-BR")  ,
+            DataLicenca: entidade.DataLicenca.toLocaleDateString("pt-BR"),
             Valor: entidade.Valor,
             Presidente: entidade.Presidente,
             Associacao: entidade.Associacao,
@@ -182,7 +182,8 @@ function has180DaysPassed(dateString: string): boolean {
           </div>
 
           <div class="flex gap-2 w-full">
-            <InputNumber input-class="w-full" class="w-12 md:w-6" type="number" v-model="associacaoSelected.Valor" placeholder="Valor"/>
+            <InputNumber input-class="w-full" class="w-12 md:w-6" type="number" v-model="associacaoSelected.Valor"
+                         placeholder="Valor"/>
             <InputNumber input-class="w-full" class="w-12 md:w-6" :min="0" :max="100" :minFractionDigits="2"
                          v-model="associacaoSelected.Versao"
                          placeholder="Versão"/>
@@ -194,7 +195,8 @@ function has180DaysPassed(dateString: string): boolean {
           </div>
 
           <div class="flex gap-2 w-full">
-            <InputMask class="w-full w-6" mask="99/99/9999" v-model="associacaoSelected.DataLicenca" placeholder="Data da Licença"/>
+            <InputMask class="w-full w-6" mask="99/99/9999" v-model="associacaoSelected.DataLicenca"
+                       placeholder="Data da Licença"/>
             <InputText class="w-full w-6" placeholder="Observação" v-model="associacaoSelected.obs"/>
           </div>
 
@@ -295,7 +297,8 @@ function has180DaysPassed(dateString: string): boolean {
 
           <div class="flex gap-2 w-full">
             <InputNumber input-class="w-full" type="number" v-model="entidade.Valor" placeholder="Valor"/>
-            <InputNumber input-class="w-full" :min="0" :max="100" :minFractionDigits="2" v-model="entidade.Versao" placeholder="Versão"/>
+            <InputNumber input-class="w-full" :min="0" :max="100" :minFractionDigits="2" v-model="entidade.Versao"
+                         placeholder="Versão"/>
           </div>
 
           <div class="flex gap-2 w-full">
