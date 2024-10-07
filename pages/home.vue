@@ -194,7 +194,7 @@ function has180DaysPassed(dateString: string): boolean {
           </div>
 
           <div class="flex gap-2 w-full">
-            <InputMask class="w-full w-6" mask="99/99/9999" v-model="associacaoSelected.DataLicenca" placeholder="Data Licença"/>
+            <InputMask class="w-full w-6" mask="99/99/9999" v-model="associacaoSelected.DataLicenca" placeholder="Data da Licença"/>
             <InputText class="w-full w-6" placeholder="Observação" v-model="associacaoSelected.obs"/>
           </div>
 
