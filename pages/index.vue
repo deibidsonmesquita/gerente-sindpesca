@@ -22,7 +22,6 @@ function efetuarlogin() {
     <span class="font-semibold uppercase"> Gerenciador SindPesca</span>
   </div>
   <div class="flex justify-content-center md:p-8 p-6">
-
     <div class="flex gap-2 w-full max-w-30rem flex-column">
       <p class="font-bold uppercase text-blue-400">Gerenciador - Login</p>
       <InputText class="w-full" v-model="usuario.login" placeholder="Login"/>
