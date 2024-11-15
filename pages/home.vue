@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Databases} from "appwrite";
+import {Databases, Query} from "appwrite";
 import {client} from "~/utils/appwrite";
 import {FilterMatchMode} from 'primevue/api';
 import type Associacao from "~/models/Associacao";
@@ -22,10 +22,12 @@ const databases = new Databases(client)
 const toast = useToast()
 const route = useRouter()
 
-onMounted(async () => {await loadUpdate()})
+onMounted(async () => {
+  await loadUpdate()
+})
 
 async function loadUpdate() {
-  const response = await databases.listDocuments(DataBaseID, tabelaID)
+  const response = await databases.listDocuments(DataBaseID, tabelaID, [Query.limit(50)])
   documentos.value = response.documents
 }
 
@@ -193,7 +195,8 @@ function has180DaysPassed(dateString: string): boolean {
           </div>
 
           <div class="flex gap-2 w-full">
-            <InputMask class="w-full w-6" mask="99/99/9999" v-model="associacaoSelected.DataLicenca" placeholder="Data da Licença"/>
+            <InputMask class="w-full w-6" mask="99/99/9999" v-model="associacaoSelected.DataLicenca"
+                       placeholder="Data da Licença"/>
             <InputText class="w-full w-6" placeholder="Observação" v-model="associacaoSelected.obs"/>
           </div>
 
