@@ -25,7 +25,7 @@ const route = useRouter()
 onMounted(async () => {await loadUpdate()})
 
 async function loadUpdate() {
-  const response = await databases.listDocuments(DataBaseID, tabelaID)
+  const response = await databases.listDocuments(DataBaseID, tabelaID, [Query.limit(50)])
   documentos.value = response.documents
 }
 
