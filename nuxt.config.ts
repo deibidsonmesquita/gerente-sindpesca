@@ -30,5 +30,6 @@ export default defineNuxtConfig({
         project: '6531782243c6330ec52f',
     },
 
-    compatibilityDate: '2024-09-06'
+    compatibilityDate: '2024-09-06',
+    ssr: false,
 })
