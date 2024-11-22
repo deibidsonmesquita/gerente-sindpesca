@@ -16,6 +16,7 @@ function efetuarlogin() {
 
 
 const {data: ufs} = await useFetch('https://gdm.vps-kinghost.net:8443/entidade/ufs/all')
+console.log(ufs.value)
 </script>
 
 <template>
