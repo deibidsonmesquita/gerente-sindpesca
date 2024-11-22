@@ -14,9 +14,12 @@ function efetuarlogin() {
   }
 }
 
+
+const {data: ufs} = await useFetch('https://gdm.vps-kinghost.net:8443/entidade/ufs/all')
 </script>
 
 <template>
+  {{ufs}}
   <div class="h-3rem bg-blue-400 gap-2 flex align-items-center p-2 text-white">
     <img src="/cherry.png" alt="cherry" width="24" height="24"/>
     <span class="font-semibold uppercase"> Gerenciador SindPesca</span>
